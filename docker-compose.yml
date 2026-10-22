@@ -1,0 +1,65 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: rag-db
+    environment:
+      POSTGRES_DB: ragdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ragdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: rag-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/ragdb
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:changeme}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:https://generativelanguage.googleapis.com}
+      CHAT_MODEL: ${CHAT_MODEL:gemini-3.5-flash}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1536}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
+      RAG_SIMILARITY_THRESHOLD: ${RAG_SIMILARITY_THRESHOLD:-0.5}
+    restart: unless-stopped
+
+  # ---- Optional: fully local models. Start with:  docker compose --profile ollama up --build ----
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag-ollama
+    profiles: ["ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: rag-ollama-pull
+    profiles: ["ollama"]
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c", "ollama pull llama3.2 && ollama pull nomic-embed-text"]
+    restart: "no"
+
+volumes:
+  pgdata:
+  ollama:
