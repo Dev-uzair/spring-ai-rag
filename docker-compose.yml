@@ -29,11 +29,13 @@ services:
       DB_URL: jdbc:postgresql://db:5432/ragdb
       DB_USER: postgres
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:changeme}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL:https://generativelanguage.googleapis.com}
-      CHAT_MODEL: ${CHAT_MODEL:gemini-3.5-flash}
-      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
-      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1536}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-changeme}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://generativelanguage.googleapis.com}
+      CHAT_COMPLETIONS_PATH: ${CHAT_COMPLETIONS_PATH:-/v1beta/openai/chat/completions}
+      EMBEDDINGS_PATH: ${EMBEDDINGS_PATH:-/v1beta/openai/embeddings}
+      CHAT_MODEL: ${CHAT_MODEL:-gemini-flash-latest}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-gemini-embedding-001}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-768}
       RAG_TOP_K: ${RAG_TOP_K:-5}
       RAG_SIMILARITY_THRESHOLD: ${RAG_SIMILARITY_THRESHOLD:-0.5}
     restart: unless-stopped

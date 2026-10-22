@@ -19,7 +19,7 @@ spring:
       chat:
         completions-path: ${CHAT_COMPLETIONS_PATH:/v1beta/openai/chat/completions}
         options:
-          model: ${CHAT_MODEL:gemini-3.5-flash}
+          model: ${CHAT_MODEL:gemini-flash-latest}
           temperature: 0.2
       embedding:
         embeddings-path: ${EMBEDDINGS_PATH:/v1beta/openai/embeddings}
